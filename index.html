@@ -28,12 +28,21 @@
 
     <div class="max-w-6xl mx-auto">
         <header class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6 text-center sm:text-left">
-            <div class="flex-1">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight">
-                    Pet<span class="text-indigo-600">Care</span> 🐾
-                </h1>
-                <p class="text-slate-500 text-sm md:text-base mt-1 italic">Gestión profesional de citas veterinarias</p>
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center overflow-hidden">
+                    <img src="/img/Gemini_Generated_Image_bpfelebpfelebpfe-removebg-preview.png" alt="PetCare Logo" class="w-full h-full object-contain">
+                </div>
+
+                <div class="flex-1">
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                        Pet<span class="text-indigo-600">Care</span> 
+                    </h1>
+                    <p class="text-slate-500 text-sm md:text-base mt-1 italic">Gestión profesional de citas veterinarias
+                    </p>
+                </div>
             </div>
+
             <button onclick="abrirModalNuevo()"
                 class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg transform hover:scale-105 active:scale-95 whitespace-nowrap">
                 + AGREGAR CITA
@@ -41,9 +50,9 @@
         </header>
 
         <div
-            class="bg-white p-4 md:p-6 rounded-3xl shadow-sm mb-8 border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            class="bg-indigo-700 p-4 md:p-6 rounded-3xl shadow-sm mb-8 border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4 w-full sm:w-auto">
-                <label class="font-semibold text-slate-700 whitespace-nowrap">Estado:</label>
+                <label class="font-semibold text-slate-700 whitespace-nowrap text-white">Estado:</label>
                 <select id="filtroEstado" onchange="renderizarCitas()"
                     class="w-full sm:w-auto bg-slate-50 border rounded-xl py-2 px-4 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                     <option value="Todas">Todas</option>
@@ -64,7 +73,8 @@
         <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
             <div class="bg-indigo-600 p-6 flex justify-between items-center">
                 <h2 id="modal-titulo" class="text-white text-xl font-bold">Nueva Cita</h2>
-                <button onclick="intentarCerrarModal()" class="text-white hover:rotate-90 transition-transform">✕</button>
+                <button onclick="intentarCerrarModal()"
+                    class="text-white hover:rotate-90 transition-transform">✕</button>
             </div>
             <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div>
@@ -119,7 +129,8 @@
                 </div>
             </div>
             <div class="p-6 bg-slate-50 flex gap-3">
-                <button onclick="intentarCerrarModal()" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-colors">CANCELAR</button>
+                <button onclick="intentarCerrarModal()"
+                    class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-colors">CANCELAR</button>
                 <button onclick="guardarCita()"
                     class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors">GUARDAR</button>
             </div>
@@ -219,11 +230,11 @@
         }
 
         function cerrarConfirmacionCancel(confirmado) {
-    document.getElementById('modalConfirmCancel').classList.add('hidden');
-    if (confirmado) {
-        toggleModal(false); // Cierra y limpia todo sin preguntar de nuevo
-    }
-}
+            document.getElementById('modalConfirmCancel').classList.add('hidden');
+            if (confirmado) {
+                toggleModal(false); // Cierra y limpia todo sin preguntar de nuevo
+            }
+        }
 
         function abrirModalNuevo() {
             editandoId = null;
@@ -372,7 +383,7 @@
             document.getElementById('stats').innerText = `Total: ${filtradas.length} citas`;
 
             filtradas.forEach(cita => {
-                const colorClass = cita.estado === 'Terminada' ? 'bg-green-50 border-green-200' :
+                const colorClass = cita.estado === 'Terminada' ? 'bg-indigo-50 border-indigo-200' :
                     cita.estado === 'Anulada' ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100';
 
                 container.innerHTML += `
