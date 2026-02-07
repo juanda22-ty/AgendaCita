@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCare - Admin de Citas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .modal-bg {
+            background-color: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6 text-center sm:text-left">
+            <div class="flex-1">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                    Pet<span class="text-indigo-600">Care</span> 🐾
+                </h1>
+                <p class="text-slate-500 text-sm md:text-base mt-1 italic">Gestión profesional de citas veterinarias</p>
+            </div>
+            <button onclick="abrirModalNuevo()"
+                class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg transform hover:scale-105 active:scale-95 whitespace-nowrap">
+                + AGREGAR CITA
+            </button>
+        </header>
+
+        <div
+            class="bg-white p-4 md:p-6 rounded-3xl shadow-sm mb-8 border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+                <label class="font-semibold text-slate-700 whitespace-nowrap">Estado:</label>
+                <select id="filtroEstado" onchange="renderizarCitas()"
+                    class="w-full sm:w-auto bg-slate-50 border rounded-xl py-2 px-4 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    <option value="Todas">Todas</option>
+                    <option value="Abierta">Abierta</option>
+                    <option value="Terminada">Terminada</option>
+                    <option value="Anulada">Anulada</option>
+                </select>
+            </div>
+            <div id="stats"
+                class="text-xs md:text-sm text-slate-400 font-medium bg-slate-50 sm:bg-transparent p-2 sm:p-0 rounded-lg w-full sm:w-auto text-center sm:text-right border sm:border-0 border-slate-100">
+            </div>
+        </div>
+
+        <div id="lista-citas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </div>
+
+    <div id="modal" class="modal-bg fixed inset-0 z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
+            <div class="bg-indigo-600 p-6 flex justify-between items-center">
+                <h2 id="modal-titulo" class="text-white text-xl font-bold">Nueva Cita</h2>
+                <button onclick="intentarCerrarModal()" class="text-white hover:rotate-90 transition-transform">✕</button>
+            </div>
+            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Mascota *</label>
+                    <input type="text" id="nombreMascota" placeholder="Nombre de la mascota"
+                        class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Propietario *</label>
+                    <input type="text" id="propietario" placeholder="Nombre del dueño"
+                        class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Teléfono * (mín. 10
+                        dígitos)</label>
+                    <input type="text" id="telefono" placeholder="Ej: 3001234567"
+                        class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Fecha *</label>
+                        <input type="date" id="fecha"
+                            class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Hora * (8am-8pm)</label>
+                        <input type="time" id="hora"
+                            class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Tipo de Mascota</label>
+                    <select id="tipoMascota"
+                        class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50">
+                        <option value="Perro">🐶 Perro</option>
+                        <option value="Gato">🐱 Gato</option>
+                        <option value="Loro">🦜 Loro</option>
+                        <option value="Conejo">🐰 Conejo</option>
+                        <option value="Hamster">🐹 Hámster</option>
+                        <option value="Tortuga">🐢 Tortuga</option>
+                        <option value="Hurón">🦦 Hurón</option>
+                        <option value="Pez">🐠 Pez</option>
+                        <option value="Iguana">🦎 Iguana</option>
+                        <option value="Caballo">🐴 Caballo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Síntomas *</label>
+                    <textarea id="sintomas" placeholder="¿Qué le sucede?"
+                        class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500 bg-slate-50"
+                        rows="2"></textarea>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 flex gap-3">
+                <button onclick="intentarCerrarModal()" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-colors">CANCELAR</button>
+                <button onclick="guardarCita()"
+                    class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalConfirm" class="modal-bg fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-lg shadow-2xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-slate-800">Confirmar</h3>
+            <p class="text-slate-600 mb-8">¿Esta seguro que desea eliminar esta cita?</p>
+            <div class="flex justify-end gap-8 font-bold text-sm tracking-widest">
+                <button onclick="cerrarConfirmacion()"
+                    class="text-indigo-600 hover:text-indigo-800 uppercase">CANCELAR</button>
+                <button onclick="confirmarEliminacion()"
+                    class="text-indigo-600 hover:text-indigo-800 uppercase">ACEPTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAlert" class="modal-bg fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center border-b-4 border-indigo-600">
+            <div id="alertIcon" class="text-5xl mb-4"></div>
+            <h3 id="alertTitle" class="text-xl font-bold mb-2 text-slate-800"></h3>
+            <p id="alertMessage" class="text-slate-500 mb-8 px-4"></p>
+            <button onclick="cerrarAlerta()"
+                class="w-full py-3 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-600 font-bold rounded-2xl transition-all tracking-widest uppercase text-xs">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <div id="modalConfirmCancel" class="modal-bg fixed inset-0 z-[70] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center border-b-4 border-orange-400">
+            <div class="text-5xl mb-4">⚠️</div>
+            <h3 class="text-xl font-bold mb-2 text-slate-800">¿Descartar cambios?</h3>
+            <p class="text-slate-500 mb-8 px-4">Si cierras ahora, perderás toda la información que has ingresado en el
+                formulario.</p>
+            <div class="flex gap-3">
+                <button onclick="cerrarConfirmacionCancel(false)"
+                    class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all uppercase text-xs">
+                    Continuar Editando
+                </button>
+                <button onclick="cerrarConfirmacionCancel(true)"
+                    class="flex-1 py-3 bg-orange-500 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all shadow-lg uppercase text-xs">
+                    Sí, descartar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let citas = [];
+        let editandoId = null;
+        let idAEliminar = null;
+
+        const imagenesMascotas = {
+            "Perro": "./img/perro.png",
+            "Gato": "./img/gato.png",
+            "Loro": "./img/loro.png",
+            "Conejo": "./img/conejo.png",
+            "Hamster": "./img/hamster.png",
+            "Tortuga": "./img/tortuga.png",
+            "Hurón": "./img/huron.png",
+            "Pez": "./img/pez.png",
+            "Iguana": "./img/iguana.png",
+            "Caballo": "./img/caballo.png"
+        };
+
+        function obtenerFechaMinima() {
+            const hoy = new Date();
+            const mañana = new Date(hoy);
+            mañana.setDate(hoy.getDate() + 1);
+            return mañana.toISOString().split('T')[0];
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('modal');
+            modal.classList.toggle('hidden', !show);
+            if (!show) {
+                editandoId = null;
+                limpiarFormulario();
+            }
+        }
+
+        function intentarCerrarModal() {
+            // Verificar si hay algún campo con texto
+            const campos = ['nombreMascota', 'propietario', 'telefono', 'fecha', 'hora', 'sintomas'];
+            const tieneDatos = campos.some(id => document.getElementById(id).value.trim() !== "");
+
+            if (tieneDatos) {
+                // Si hay datos, mostramos la alerta de confirmación
+                document.getElementById('modalConfirmCancel').classList.remove('hidden');
+            } else {
+                // Si está vacío, cerramos directamente
+                toggleModal(false);
+            }
+        }
+
+        function cerrarConfirmacionCancel(confirmado) {
+    document.getElementById('modalConfirmCancel').classList.add('hidden');
+    if (confirmado) {
+        toggleModal(false); // Cierra y limpia todo sin preguntar de nuevo
+    }
+}
+
+        function abrirModalNuevo() {
+            editandoId = null;
+            document.getElementById('modal-titulo').innerText = "Nueva Cita";
+            document.getElementById('fecha').setAttribute('min', obtenerFechaMinima());
+            toggleModal(true);
+        }
+
+        function editarCita(id) {
+            const c = citas.find(x => x.id === id);
+            if (c) {
+                editandoId = id;
+                document.getElementById('modal-titulo').innerText = "Editar Cita";
+                document.getElementById('fecha').setAttribute('min', obtenerFechaMinima());
+
+                document.getElementById('nombreMascota').value = c.nombreMascota;
+                document.getElementById('propietario').value = c.propietario;
+                document.getElementById('telefono').value = c.telefono;
+                document.getElementById('fecha').value = c.fecha;
+                document.getElementById('hora').value = c.hora;
+                document.getElementById('tipoMascota').value = c.tipo;
+                document.getElementById('sintomas').value = c.sintomas;
+                toggleModal(true);
+            }
+        }
+
+        function guardarCita() {
+            const nombreMascota = document.getElementById('nombreMascota').value.trim();
+            const propietario = document.getElementById('propietario').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const sintomas = document.getElementById('sintomas').value.trim();
+
+            // Validaciones específicas con iconos
+            if (!nombreMascota) return mostrarAlerta("El nombre de la mascota es obligatorio.", 'error');
+            if (!propietario) return mostrarAlerta("El nombre del propietario es obligatorio.", 'error');
+
+            if (!telefono) {
+                return mostrarAlerta("El número de teléfono es necesario.", 'error');
+            } else if (!/^\d+$/.test(telefono)) {
+                // Esta regex verifica que el texto contenga ÚNICAMENTE dígitos
+                return mostrarAlerta("El teléfono no puede contener letras ni caracteres especiales.", 'error');
+            } else if (telefono.length <= 9) {
+                return mostrarAlerta("El teléfono debe tener al menos 10 dígitos.", 'error');
+            }
+
+            if (!fecha) return mostrarAlerta("Debes seleccionar una fecha.", 'error');
+
+            if (!hora) {
+                return mostrarAlerta("Debes seleccionar una hora.", 'error');
+            } else {
+                const h = parseInt(hora.split(':')[0]);
+                if (h < 8 || h >= 20) {
+                    return mostrarAlerta("Nuestro horario es de 08:00 AM a 08:00 PM.", 'error');
+                }
+            }
+
+            if (!sintomas) return mostrarAlerta("Por favor, dinos qué síntomas presenta.", 'error');
+
+            // Proceso de guardado
+            const datosCita = {
+                nombreMascota, propietario, telefono, fecha, hora,
+                tipo: document.getElementById('tipoMascota').value,
+                sintomas
+            };
+
+            if (editandoId) {
+                citas = citas.map(c => c.id === editandoId ? { ...c, ...datosCita } : c);
+                mostrarAlerta("Cita actualizada correctamente.", 'success');
+            } else {
+                citas.push({ ...datosCita, id: Date.now(), estado: 'Abierta' });
+                mostrarAlerta("Cita agendada con éxito.", 'success');
+            }
+
+            renderizarCitas();
+            toggleModal(false);
+        }
+
+        function abrirConfirmacion(id) {
+            idAEliminar = id;
+            document.getElementById('modalConfirm').classList.remove('hidden');
+        }
+
+        function cerrarConfirmacion() {
+            idAEliminar = null;
+            document.getElementById('modalConfirm').classList.add('hidden');
+        }
+
+        function confirmarEliminacion() {
+            if (idAEliminar) {
+                citas = citas.filter(c => c.id !== idAEliminar);
+                renderizarCitas();
+                cerrarConfirmacion();
+            }
+        }
+
+        function mostrarAlerta(mensaje, tipo = 'error') {
+            const iconContainer = document.getElementById('alertIcon');
+            const titleContainer = document.getElementById('alertTitle');
+
+            if (tipo === 'error') {
+                iconContainer.innerHTML = '⚠️';
+                titleContainer.innerText = '¡Ups! Algo falta';
+                titleContainer.className = 'text-xl font-bold mb-2 text-orange-500';
+            } else {
+                iconContainer.innerHTML = '✅';
+                titleContainer.innerText = '¡Excelente!';
+                titleContainer.className = 'text-xl font-bold mb-2 text-green-500';
+            }
+
+            document.getElementById('alertMessage').innerText = mensaje;
+            document.getElementById('modalAlert').classList.remove('hidden');
+        }
+
+        function cerrarAlerta() {
+            document.getElementById('modalAlert').classList.add('hidden');
+        }
+
+        function abrirConfirmacionCancelacion() {
+            document.getElementById('modalConfirmCancel').classList.remove('hidden');
+        }
+
+        function cerrarConfirmacionCancel(confirmado) {
+            document.getElementById('modalConfirmCancel').classList.add('hidden');
+
+            if (confirmado) {
+                // Si el usuario decide descartar, limpiamos y cerramos el modal principal
+                document.getElementById('modal').classList.add('hidden');
+                editandoId = null;
+                limpiarFormulario();
+            }
+        }
+
+        function cambiarEstado(id, nuevo) {
+            citas = citas.map(c => c.id === id ? { ...c, estado: nuevo } : c);
+            renderizarCitas();
+        }
+
+        function renderizarCitas() {
+            const container = document.getElementById('lista-citas');
+            const filtro = document.getElementById('filtroEstado').value;
+            container.innerHTML = '';
+
+            const filtradas = citas.filter(c => filtro === 'Todas' || c.estado === filtro);
+            document.getElementById('stats').innerText = `Total: ${filtradas.length} citas`;
+
+            filtradas.forEach(cita => {
+                const colorClass = cita.estado === 'Terminada' ? 'bg-green-50 border-green-200' :
+                    cita.estado === 'Anulada' ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100';
+
+                container.innerHTML += `
+                    <div class="${colorClass} border-2 rounded-3xl p-6 card-shadow relative transition-all hover:scale-[1.01]">
+                        <img src="${imagenesMascotas[cita.tipo]}" class="w-14 h-14 absolute top-4 right-4 opacity-90">
+                        <p class="text-[13px] text-slate-400 font-mono mb-1">ID: ${cita.id}</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-1">${cita.nombreMascota}</h3>
+                        <p class="text-xs font-bold text-indigo-500 uppercase mb-4">${cita.tipo}</p>
+                        
+                        <div class="space-y-2 mb-6 text-sm text-slate-600">
+                            <p><strong>👤 Dueño:</strong> ${cita.propietario}</p>
+                            <p><strong>📞 Tel:</strong> ${cita.telefono}</p>
+                            <p><strong>📅 Cita:</strong> ${cita.fecha} | ${cita.hora}</p>
+                            <div class="bg-black/5 p-3 rounded-xl italic text-xs mt-3">"${cita.sintomas}"</div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Estado:</span>
+                                <select onchange="cambiarEstado(${cita.id}, this.value)" class="flex-1 bg-white border rounded-lg p-1 text-xs outline-none">
+                                    <option value="Abierta" ${cita.estado === 'Abierta' ? 'selected' : ''}>Abierta</option>
+                                    <option value="Terminada" ${cita.estado === 'Terminada' ? 'selected' : ''}>Terminada</option>
+                                    <option value="Anulada" ${cita.estado === 'Anulada' ? 'selected' : ''}>Anulada</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editarCita(${cita.id})" class="flex-1 p-2 bg-slate-100 hover:bg-indigo-100 rounded-xl transition-colors">📝 Editar</button>
+                                <button onclick="abrirConfirmacion(${cita.id})" class="flex-1 p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-xl transition-colors">❌ Borrar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function limpiarFormulario() {
+            ['nombreMascota', 'propietario', 'telefono', 'fecha', 'hora', 'sintomas'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('tipoMascota').selectedIndex = 0;
+        }
+    </script>
+</body>
+
+</html>
