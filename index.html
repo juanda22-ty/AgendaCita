@@ -216,15 +216,12 @@
         }
 
         function intentarCerrarModal() {
-            // Verificar si hay algún campo con texto
             const campos = ['nombreMascota', 'propietario', 'telefono', 'fecha', 'hora', 'sintomas'];
             const tieneDatos = campos.some(id => document.getElementById(id).value.trim() !== "");
 
             if (tieneDatos) {
-                // Si hay datos, mostramos la alerta de confirmación
                 document.getElementById('modalConfirmCancel').classList.remove('hidden');
             } else {
-                // Si está vacío, cerramos directamente
                 toggleModal(false);
             }
         }
@@ -232,7 +229,7 @@
         function cerrarConfirmacionCancel(confirmado) {
             document.getElementById('modalConfirmCancel').classList.add('hidden');
             if (confirmado) {
-                toggleModal(false); // Cierra y limpia todo sin preguntar de nuevo
+                toggleModal(false); 
             }
         }
 
@@ -276,7 +273,6 @@
             if (!telefono) {
                 return mostrarAlerta("El número de teléfono es necesario.", 'error');
             } else if (!/^\d+$/.test(telefono)) {
-                // Esta regex verifica que el texto contenga ÚNICAMENTE dígitos
                 return mostrarAlerta("El teléfono no puede contener letras ni caracteres especiales.", 'error');
             } else if (telefono.length <= 9) {
                 return mostrarAlerta("El teléfono debe tener al menos 10 dígitos.", 'error');
@@ -295,7 +291,6 @@
 
             if (!sintomas) return mostrarAlerta("Por favor, dinos qué síntomas presenta.", 'error');
 
-            // Proceso de guardado
             const datosCita = {
                 nombreMascota, propietario, telefono, fecha, hora,
                 tipo: document.getElementById('tipoMascota').value,
@@ -362,7 +357,6 @@
             document.getElementById('modalConfirmCancel').classList.add('hidden');
 
             if (confirmado) {
-                // Si el usuario decide descartar, limpiamos y cerramos el modal principal
                 document.getElementById('modal').classList.add('hidden');
                 editandoId = null;
                 limpiarFormulario();
@@ -429,4 +423,5 @@
 </body>
 
 </html>
+
 
